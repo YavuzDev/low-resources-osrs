@@ -20,10 +20,16 @@ import java.util.jar.JarFile;
 
 public class HooksFinder {
 
+    private static final boolean DOWNLOAD_JAR = false;
+
+    private static final boolean UNZIP_JAR = false;
+
     public static void main(String[] args) throws Exception {
         var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
         var jarFile = Path.of("resources", "hooks", "gamepack.jar");
-        FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
+        if (DOWNLOAD_JAR) {
+            FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
+        }
 
         var inputStreams = unZipJar(jarFile);
         var classes = read(inputStreams);
@@ -94,7 +100,9 @@ public class HooksFinder {
                     try {
                         var inputStream = jarFile.getInputStream(jarEntry);
                         streams.add(new NameAndInputStream(jarEntry.getName(), jarFile.getInputStream(jarEntry)));
-                        FileUtils.copyInputStreamToFile(inputStream, unzipDirectory.resolve(jarEntry.getName()).toFile());
+                        if (UNZIP_JAR) {
+                            FileUtils.copyInputStreamToFile(inputStream, unzipDirectory.resolve(jarEntry.getName()).toFile());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

@@ -1,8 +1,11 @@
 package visitor;
 
-import hook.ClassHook;
-import hook.FieldHook;
 import hook.Hooks;
+import hook.global.StaticFieldHook;
+import hook.global.StaticMethodHook;
+import hook.local.ClassHook;
+import hook.local.FieldHook;
+import hook.local.MethodHook;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import reader.ObfuscatedClass;
@@ -34,6 +37,18 @@ public abstract class HookVisitor extends ClassVisitor {
         hooks.getCorrectClass(currentClass).addFieldHook(givenName, fieldHook);
     }
 
+    public void addMethodHook(String givenName, MethodHook methodHook) {
+        hooks.getCorrectClass(currentClass).addMethodHook(givenName, methodHook);
+    }
+
+    public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
+        hooks.getStatics().addField(givenName, staticFieldHook);
+    }
+
+    public void addStaticMethodHook(String givenName, StaticMethodHook staticMethodHook) {
+        hooks.getStatics().addMethod(givenName, staticMethodHook);
+    }
+
     public FieldAmountCondition fieldCondition(int amount, String type) {
         return new FieldAmountCondition(amount, correctType(type));
     }
@@ -44,6 +59,10 @@ public abstract class HookVisitor extends ClassVisitor {
             case "integer", "int" -> "I";
             default -> original;
         };
+    }
+
+    public ObfuscatedClass getCurrentClass() {
+        return currentClass;
     }
 
     public void setCurrentClass(ObfuscatedClass currentClass) {

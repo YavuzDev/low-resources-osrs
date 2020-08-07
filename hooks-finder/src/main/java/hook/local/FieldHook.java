@@ -1,4 +1,4 @@
-package hook;
+package hook.local;
 
 public class FieldHook {
 

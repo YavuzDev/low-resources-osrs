@@ -1,55 +1,77 @@
 {
+  "statics": {
+    "fields": {},
+    "methods": {}
+  },
   "classes": {
-    "Test": {
-      "name": "gz",
+    "GameEngine": {
+      "name": "q",
       "fields": {
-        "Testq": {
-          "name": "q",
-          "type": "Lgz;"
+        "Fieldd": {
+          "name": "d",
+          "type": "I"
         },
-        "Testa": {
-          "name": "a",
-          "type": "Ljava/lang/String;"
+        "Fieldtm": {
+          "name": "tm",
+          "type": "I"
         },
-        "Testp": {
-          "name": "p",
-          "type": "Lgz;"
+        "Fieldqo": {
+          "name": "qo",
+          "type": "Ldt;"
         },
-        "Testo": {
-          "name": "o",
-          "type": "Lgz;"
+        "Fieldae": {
+          "name": "ae",
+          "type": "I"
         },
-        "Testn": {
-          "name": "n",
-          "type": "Lgz;"
-        },
-        "Testm": {
+        "Fieldbv": {
+          "name": "bv",
+          "type": "I"
+        }
+      },
+      "methods": {
+        "Methodm": {
           "name": "m",
-          "type": "Lgz;"
+          "type": "(Ljava/lang/Object;Lkn;B)V"
         },
-        "Testj": {
+        "Methodn": {
+          "name": "n",
+          "type": "(IS)I"
+        },
+        "Methodo": {
+          "name": "o",
+          "type": "(Lkn;B)Ljava/lang/Object;"
+        },
+        "Methodp": {
+          "name": "p",
+          "type": "(Ljava/lang/Object;Lkn;)V"
+        },
+        "Methodj": {
           "name": "j",
-          "type": "Lgz;"
+          "type": "(Ljava/lang/Object;Lkn;)V"
         },
-        "Testz": {
-          "name": "z",
-          "type": "I"
-        },
-        "Testbt": {
-          "name": "bt",
-          "type": "I"
-        },
-        "Testw": {
-          "name": "w",
-          "type": "[Lgz;"
-        },
-        "Testg": {
-          "name": "g",
-          "type": "Lgz;"
-        },
-        "Testu": {
+        "Methodu": {
           "name": "u",
-          "type": "Ljava/lang/String;"
+          "type": "(Ljava/lang/Long;Lkn;I)V"
+        },
+        "Methodg": {
+          "name": "g",
+          "type": "(Lkn;)Ljava/lang/Object;"
+        },
+        "Methodq": {
+          "name": "q",
+          "type": "(Ljava/lang/Object;Lkn;)V"
+        },
+        "Methoda": {
+          "name": "a",
+          "type": "(Ljava/lang/Long;Lkn;)V"
+        },
+        "Methodhi": {
+          "name": "hi",
+          "type": "(ZLkb;I)V"
+        },
+        "Method\u003cinit\u003e": {
+          "name": "\u003cinit\u003e",
+          "type": "()V"
         }
       }
     }
