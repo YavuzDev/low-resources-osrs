@@ -1,0 +1,57 @@
+{
+  "classes": {
+    "Test": {
+      "name": "gz",
+      "fields": {
+        "Testq": {
+          "name": "q",
+          "type": "Lgz;"
+        },
+        "Testa": {
+          "name": "a",
+          "type": "Ljava/lang/String;"
+        },
+        "Testp": {
+          "name": "p",
+          "type": "Lgz;"
+        },
+        "Testo": {
+          "name": "o",
+          "type": "Lgz;"
+        },
+        "Testn": {
+          "name": "n",
+          "type": "Lgz;"
+        },
+        "Testm": {
+          "name": "m",
+          "type": "Lgz;"
+        },
+        "Testj": {
+          "name": "j",
+          "type": "Lgz;"
+        },
+        "Testz": {
+          "name": "z",
+          "type": "I"
+        },
+        "Testbt": {
+          "name": "bt",
+          "type": "I"
+        },
+        "Testw": {
+          "name": "w",
+          "type": "[Lgz;"
+        },
+        "Testg": {
+          "name": "g",
+          "type": "Lgz;"
+        },
+        "Testu": {
+          "name": "u",
+          "type": "Ljava/lang/String;"
+        }
+      }
+    }
+  }
+}
