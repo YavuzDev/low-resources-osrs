@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import hook.Hooks;
 import org.apache.commons.io.FileUtils;
 
 import java.io.FileNotFoundException;
@@ -26,10 +28,14 @@ public class HooksInjector {
             throw new FileNotFoundException("hooks.json not found, set FIND_HOOKS to true");
         }
 
-        var injectedPath = jarFile.getParent().resolve("gamepack-injected.jar");
-        if (!Files.exists(injectedPath)) {
-            Files.createFile(injectedPath);
-            FileUtils.copyInputStreamToFile(Files.newInputStream(jarFile), injectedPath.toFile());
-        }
+        var gson = new Gson();
+        var hooks = gson.fromJson(Files.readString(hooksJsonPath), Hooks.class);
+        System.out.println(hooks);
+
+//        var injectedPath = jarFile.getParent().resolve("gamepack-injected.jar");
+//        if (!Files.exists(injectedPath)) {
+//            Files.createFile(injectedPath);
+//            FileUtils.copyInputStreamToFile(Files.newInputStream(jarFile), injectedPath.toFile());
+//        }
     }
 }
