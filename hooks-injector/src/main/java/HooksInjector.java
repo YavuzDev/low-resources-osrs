@@ -1,6 +1,8 @@
 import com.google.gson.Gson;
 import hook.Hooks;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -9,17 +11,22 @@ import java.nio.file.Path;
 
 public class HooksInjector {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HooksInjector.class);
+
     private static final boolean FIND_HOOKS = false;
 
     private static final boolean DOWNLOAD_JAR = false;
 
     public static void main(String[] args) throws Exception {
         if (FIND_HOOKS) {
+            LOGGER.info("Finding hooks");
             HooksFinder.main(args);
         }
-        var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
         var jarFile = Path.of("resources", "injector", "gamepack.jar");
         if (DOWNLOAD_JAR) {
+            var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
+            LOGGER.info("Downloading jar from {}", jarUrl);
+
             FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
         }
 
@@ -30,7 +37,7 @@ public class HooksInjector {
 
         var gson = new Gson();
         var hooks = gson.fromJson(Files.readString(hooksJsonPath), Hooks.class);
-        System.out.println(hooks);
+        LOGGER.info("{}", hooks);
 
 //        var injectedPath = jarFile.getParent().resolve("gamepack-injected.jar");
 //        if (!Files.exists(injectedPath)) {

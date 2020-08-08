@@ -1,5 +1,8 @@
 package util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +16,8 @@ import java.util.Map;
 
 public class OsrsConfig {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OsrsConfig.class);
+
     private final Map<String, String> appletProperties;
 
     private final Map<String, String> classLoaderProperties;
@@ -22,6 +27,7 @@ public class OsrsConfig {
     }
 
     public static OsrsConfig load(URL url) throws IOException {
+        LOGGER.info("Loading configs from {}", url);
         return load(new InputStreamReader(url.openStream()));
     }
 

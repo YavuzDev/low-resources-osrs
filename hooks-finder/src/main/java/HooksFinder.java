@@ -33,10 +33,11 @@ public class HooksFinder {
     private static final boolean UNZIP_JAR = false;
 
     public static void main(String[] args) throws Exception {
-        var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
         var jarFile = Path.of("resources", "hooks", "gamepack.jar");
         if (DOWNLOAD_JAR) {
-            LOGGER.info("Downloading jar");
+            var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
+            LOGGER.info("Downloading jar from {}", jarUrl);
+
             FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
         }
 
@@ -109,10 +110,8 @@ public class HooksFinder {
 
     private static void findHooks(HookVisitor instance, Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
         LOGGER.info("Visiting {}", instance.getClass().getName());
+
         var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
-        if (correctClass == null) {
-            throw new FileNotFoundException("Unable to find class for " + instance + " with conditions: " + instance.conditions());
-        }
         instance.setCurrentClass(correctClass);
 
         var inputStream = getInputStreamForClass(jarPath, correctClass.getName());
