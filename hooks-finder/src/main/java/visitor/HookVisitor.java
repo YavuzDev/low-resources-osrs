@@ -10,6 +10,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reader.ObfuscatedClass;
 import visitor.condition.Condition;
 import visitor.condition.FieldAmountCondition;
@@ -19,11 +21,10 @@ import visitor.condition.ParameterAmountCondition;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public abstract class HookVisitor extends ClassVisitor {
 
-    private static final Logger LOGGER = Logger.getLogger(HookVisitor.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(HookVisitor.class);
 
     private final Hooks hooks;
 
@@ -56,7 +57,7 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
-        LOGGER.info("Adding hook with name: " + givenName + " hook: " + staticFieldHook);
+        LOGGER.info("Adding static field hook with name: {} hook: {}", givenName, staticFieldHook);
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
@@ -131,7 +132,7 @@ public abstract class HookVisitor extends ClassVisitor {
                 conditionCount = 0;
                 continue;
             }
-            LOGGER.info("Found " + method.name + " from conditions " + Arrays.toString(conditions));
+            LOGGER.info("Found method {} from conditions {} ", method.name, Arrays.toString(conditions));
             return method;
         }
         throw new NullPointerException("No function found with conditions: " + Arrays.toString(conditions));
@@ -153,7 +154,7 @@ public abstract class HookVisitor extends ClassVisitor {
                 continue;
             }
             var field = (FieldInsnNode) instruction;
-            LOGGER.info("Found " + field.name + " from conditions " + Arrays.toString(conditions));
+            LOGGER.info("Found field {} from conditions {} ", field.name, Arrays.toString(conditions));
             return field;
         }
         throw new NullPointerException("No static variable found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
