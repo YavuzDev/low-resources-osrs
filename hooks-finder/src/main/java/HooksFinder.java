@@ -35,6 +35,10 @@ public class HooksFinder {
             FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
         }
 
+        if (!Files.exists(jarFile)) {
+            throw new FileNotFoundException("Jar not found set DOWNLOAD_JAR to true");
+        }
+
         var inputStreams = unZipJar(jarFile);
         var classes = read(inputStreams);
 
@@ -43,7 +47,11 @@ public class HooksFinder {
 
     private static InputStream getInputStreamForClass(Path jarPath, String fileName) throws IOException {
         var unzippedDirectory = jarPath.getParent().resolve("unzipped");
-        return Files.newInputStream(unzippedDirectory.resolve(fileName + ".class"));
+        var filePath = unzippedDirectory.resolve(fileName + ".class");
+        if (!Files.exists(unzippedDirectory) || !Files.exists(filePath)) {
+            throw new FileNotFoundException("Unzipped files not found set UNZIP_JAR to true");
+        }
+        return Files.newInputStream(filePath);
     }
 
     private static void loadVisitors(Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
