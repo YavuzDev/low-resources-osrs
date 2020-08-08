@@ -19,8 +19,11 @@ import visitor.condition.ParameterAmountCondition;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public abstract class HookVisitor extends ClassVisitor {
+
+    private static final Logger LOGGER = Logger.getLogger(HookVisitor.class.getName());
 
     private final Hooks hooks;
 
@@ -53,6 +56,7 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
+        LOGGER.info("Adding hook with name: " + givenName + " hook: " + staticFieldHook);
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
@@ -127,6 +131,7 @@ public abstract class HookVisitor extends ClassVisitor {
                 conditionCount = 0;
                 continue;
             }
+            LOGGER.info("Found " + method.name + " from conditions " + Arrays.toString(conditions));
             return method;
         }
         throw new NullPointerException("No function found with conditions: " + Arrays.toString(conditions));
@@ -147,7 +152,9 @@ public abstract class HookVisitor extends ClassVisitor {
                 conditionCount = 0;
                 continue;
             }
-            return (FieldInsnNode) instruction;
+            var field = (FieldInsnNode) instruction;
+            LOGGER.info("Found " + field.name + " from conditions " + Arrays.toString(conditions));
+            return field;
         }
         throw new NullPointerException("No static variable found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
     }

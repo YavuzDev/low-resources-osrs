@@ -21,8 +21,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 public class HooksFinder {
+
+    private static final Logger LOGGER = Logger.getLogger(HooksFinder.class.getName());
 
     private static final boolean DOWNLOAD_JAR = false;
 
@@ -32,6 +35,7 @@ public class HooksFinder {
         var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
         var jarFile = Path.of("resources", "hooks", "gamepack.jar");
         if (DOWNLOAD_JAR) {
+            LOGGER.info("Downloading jar");
             FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
         }
 
@@ -103,6 +107,7 @@ public class HooksFinder {
     }
 
     private static void findHooks(HookVisitor instance, Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
+        LOGGER.info("Visiting " + instance.getClass().getName());
         var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
         if (correctClass == null) {
             throw new FileNotFoundException("Unable to find class for " + instance + " with conditions: " + instance.conditions());
@@ -129,12 +134,15 @@ public class HooksFinder {
                 correctConditionsCount = 0;
                 continue;
             }
+            LOGGER.info("Found " + obfuscatedClass + " from conditions " + conditions);
             return obfuscatedClass;
         }
         throw new NullPointerException("No class found with conditions: " + conditions);
     }
 
     private static List<NameAndInputStream> unZipJar(Path jarPath) throws IOException {
+        LOGGER.info("Reading input streams from jar " + jarPath);
+
         var streams = new ArrayList<NameAndInputStream>();
         var jarFile = new JarFile(jarPath.toString());
 
