@@ -26,4 +26,11 @@ public class OpcodeCondition implements Condition {
     public boolean check(AbstractInsnNode abstractInsnNode) {
         return abstractInsnNode.getOpcode() == opcode;
     }
+
+    @Override
+    public String toString() {
+        return "OpcodeCondition{" +
+                "opcode=" + opcode +
+                '}';
+    }
 }

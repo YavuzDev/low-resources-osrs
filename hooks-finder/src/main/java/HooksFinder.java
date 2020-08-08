@@ -135,7 +135,7 @@ public class HooksFinder {
                 correctConditionsCount = 0;
                 continue;
             }
-            LOGGER.info("Found {} from conditions {}", obfuscatedClass, conditions);
+            LOGGER.info("Found class {} from conditions {}", obfuscatedClass.getName(), conditions);
             return obfuscatedClass;
         }
         throw new NullPointerException("No class found with conditions: " + conditions);

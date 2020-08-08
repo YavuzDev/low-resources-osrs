@@ -57,7 +57,7 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
-        LOGGER.info("Adding static field hook with name: {} hook: {}", givenName, staticFieldHook);
+        LOGGER.info("Adding static field hook with name {} and hook: {}", givenName, staticFieldHook);
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
