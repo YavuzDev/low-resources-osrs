@@ -15,7 +15,7 @@ public class WidgetVisitor extends HookVisitor {
 
     @Override
     public List<Condition> conditions() {
-        return List.of(fieldCondition(50, 80, "Int"), fieldCondition(4, 6, "String"));
+        return List.of(fieldCondition(50, 80, "Int"), fieldCondition(6, "String"));
     }
 
     @Override
