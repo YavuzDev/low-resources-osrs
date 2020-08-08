@@ -28,40 +28,50 @@ public class HooksFinder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HooksFinder.class);
 
+    private static final String JAR_URL = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
+
+    private static final String HOOKS_PACKAGE = "visitor.impl";
+
+    public static final Path RESOURCES_DIRECTORY = Path.of("resources");
+
+    public static final Path HOOKS_PATH_DIRECTORY = RESOURCES_DIRECTORY.resolve("hooks");
+
+    public static final Path HOOKS_JSON_PATH = HOOKS_PATH_DIRECTORY.resolve("hooks.json");
+
+    public static final Path JAR_FILE = HOOKS_PATH_DIRECTORY.resolve("gamepack.jar");
+
     private static final boolean DOWNLOAD_JAR = false;
 
     private static final boolean UNZIP_JAR = false;
 
     public static void main(String[] args) throws Exception {
-        var jarFile = Path.of("resources", "hooks", "gamepack.jar");
         if (DOWNLOAD_JAR) {
-            var jarUrl = "http://oldschool83.runescape.com/gamepack_for_kaleem_and_emre_bot_client.jar";
-            LOGGER.info("Downloading jar from {}", jarUrl);
-
-            FileUtils.copyURLToFile(new URL(jarUrl), jarFile.toFile());
+            LOGGER.info("Downloading jar from {}", JAR_URL);
+            FileUtils.copyURLToFile(new URL(JAR_URL), JAR_FILE.toFile());
         }
 
-        if (!Files.exists(jarFile)) {
-            throw new FileNotFoundException("Jar not found set DOWNLOAD_JAR to true");
+        if (!Files.exists(JAR_FILE)) {
+            throw new FileNotFoundException(JAR_FILE + " not found set DOWNLOAD_JAR to true");
         }
 
-        var inputStreams = unZipJar(jarFile);
+        var inputStreams = unZipJar(JAR_FILE);
         var classes = read(inputStreams);
 
-        loadVisitors(jarFile, classes);
+        loadVisitors(classes);
     }
 
     private static InputStream getInputStreamForClass(Path jarPath, String fileName) throws IOException {
         var unzippedDirectory = jarPath.getParent().resolve("unzipped");
         var filePath = unzippedDirectory.resolve(fileName + ".class");
         if (!Files.exists(unzippedDirectory) || !Files.exists(filePath)) {
-            throw new FileNotFoundException("Unzipped files not found set UNZIP_JAR to true");
+            throw new FileNotFoundException("Unzipped files at " + unzippedDirectory + " not found set UNZIP_JAR to true");
         }
         return Files.newInputStream(filePath);
     }
 
-    private static void loadVisitors(Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
-        var reflections = new Reflections("visitor.impl");
+    private static void loadVisitors(List<ObfuscatedClass> obfuscatedClasses) throws IOException {
+        LOGGER.info("Looking through package {} to load visitors", HOOKS_PACKAGE);
+        var reflections = new Reflections(HOOKS_PACKAGE);
         var classes = reflections.getSubTypesOf(HookVisitor.class);
 
         var hooks = new Hooks();
@@ -75,7 +85,7 @@ public class HooksFinder {
                     visitors.add(new DependentVisitor(instance, dependsOn.value()));
                     return;
                 }
-                findHooks(instance, jarPath, obfuscatedClasses);
+                findHooks(instance, HooksFinder.JAR_FILE, obfuscatedClasses);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -84,14 +94,14 @@ public class HooksFinder {
         var visited = new HashSet<DependentVisitor>();
         visitors.forEach(v -> {
             try {
-                visit(v, jarPath, obfuscatedClasses, visitors, visited);
+                visit(v, HooksFinder.JAR_FILE, obfuscatedClasses, visitors, visited);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         var gson = new GsonBuilder().setPrettyPrinting().create();
-        Files.write(jarPath.getParent().resolve("hooks.json"), gson.toJson(hooks).getBytes());
+        Files.write(HOOKS_JSON_PATH, gson.toJson(hooks).getBytes());
     }
 
     private static void visit(DependentVisitor dependentVisitor, Path jarPath, List<ObfuscatedClass> obfuscatedClasses, List<DependentVisitor> visitors, Set<DependentVisitor> visited) throws IOException {
