@@ -32,6 +32,10 @@ public class Hooks {
         return statics;
     }
 
+    public boolean containsStaticField(String givenName) {
+        return statics.getFields().containsKey(givenName);
+    }
+
     public boolean containsClass(ObfuscatedClass obfuscatedClass) {
         return classes
                 .entrySet()

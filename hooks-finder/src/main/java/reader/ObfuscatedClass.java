@@ -11,6 +11,8 @@ public class ObfuscatedClass {
 
     private final ClassNode classNode;
 
+    private String givenName;
+
     public ObfuscatedClass(String name, ClassNode classNode) {
         this.name = name;
         this.classNode = classNode;
@@ -28,11 +30,20 @@ public class ObfuscatedClass {
         return classNode;
     }
 
+    public String getGivenName() {
+        return givenName;
+    }
+
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
     @Override
     public String toString() {
         return "ObfuscatedClass{" +
                 "name='" + name + '\'' +
                 ", classNode=" + classNode +
+                ", givenName='" + givenName + '\'' +
                 '}';
     }
 }

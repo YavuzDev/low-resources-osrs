@@ -13,16 +13,20 @@ import visitor.condition.Condition;
 import visitor.condition.FieldAmountCondition;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class HookVisitor extends ClassVisitor {
 
     private final Hooks hooks;
 
+    private final List<ObfuscatedClass> allClasses;
+
     private ObfuscatedClass currentClass;
 
-    public HookVisitor() {
+    public HookVisitor(Hooks hooks, List<ObfuscatedClass> allClasses) {
         super(Opcodes.ASM9);
-        this.hooks = new Hooks();
+        this.hooks = hooks;
+        this.allClasses = allClasses;
     }
 
     public abstract List<Condition> conditions();
@@ -45,19 +49,36 @@ public abstract class HookVisitor extends ClassVisitor {
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
+    public void addStaticFieldHookIfNotContains(String givenName, StaticFieldHook staticFieldHook) {
+        if (hooks.containsStaticField(givenName)) {
+            return;
+        }
+        hooks.getStatics().addField(givenName, staticFieldHook);
+    }
+
     public void addStaticMethodHook(String givenName, StaticMethodHook staticMethodHook) {
         hooks.getStatics().addMethod(givenName, staticMethodHook);
     }
 
     public FieldAmountCondition fieldCondition(int amount, String type) {
-        return new FieldAmountCondition(amount, correctType(type));
+        return new FieldAmountCondition(amount, amount, correctType(type));
     }
 
-    private String correctType(String original) {
+    public FieldAmountCondition fieldCondition(int min, int max, String type) {
+        return new FieldAmountCondition(min, max, correctType(type));
+    }
+
+    public String correctType(String original) {
         return switch (original.toLowerCase()) {
             case "string" -> "Ljava/lang/String;";
             case "integer", "int" -> "I";
-            default -> original;
+            default -> "L" + Objects.requireNonNull(allClasses
+                    .stream()
+                    .filter(c -> c.getGivenName() != null)
+                    .filter(c -> c.getGivenName().equalsIgnoreCase(original))
+                    .findFirst()
+                    .orElse(null))
+                    .getName() + ";";
         };
     }
 
@@ -67,6 +88,7 @@ public abstract class HookVisitor extends ClassVisitor {
 
     public void setCurrentClass(ObfuscatedClass currentClass) {
         this.currentClass = currentClass;
+        this.currentClass.setGivenName(className());
         if (!hooks.containsClass(currentClass)) {
             hooks.addClassHook(className(), new ClassHook(currentClass.getName()));
         }

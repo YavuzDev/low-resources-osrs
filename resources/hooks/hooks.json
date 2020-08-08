@@ -1,79 +1,24 @@
 {
   "statics": {
-    "fields": {},
+    "fields": {
+      "viewport": {
+        "owner": "client",
+        "name": "mq",
+        "type": "Lhd;"
+      }
+    },
     "methods": {}
   },
   "classes": {
-    "GameEngine": {
-      "name": "q",
-      "fields": {
-        "Fieldd": {
-          "name": "d",
-          "type": "I"
-        },
-        "Fieldtm": {
-          "name": "tm",
-          "type": "I"
-        },
-        "Fieldqo": {
-          "name": "qo",
-          "type": "Ldt;"
-        },
-        "Fieldae": {
-          "name": "ae",
-          "type": "I"
-        },
-        "Fieldbv": {
-          "name": "bv",
-          "type": "I"
-        }
-      },
-      "methods": {
-        "Methodm": {
-          "name": "m",
-          "type": "(Ljava/lang/Object;Lkn;B)V"
-        },
-        "Methodn": {
-          "name": "n",
-          "type": "(IS)I"
-        },
-        "Methodo": {
-          "name": "o",
-          "type": "(Lkn;B)Ljava/lang/Object;"
-        },
-        "Methodp": {
-          "name": "p",
-          "type": "(Ljava/lang/Object;Lkn;)V"
-        },
-        "Methodj": {
-          "name": "j",
-          "type": "(Ljava/lang/Object;Lkn;)V"
-        },
-        "Methodu": {
-          "name": "u",
-          "type": "(Ljava/lang/Long;Lkn;I)V"
-        },
-        "Methodg": {
-          "name": "g",
-          "type": "(Lkn;)Ljava/lang/Object;"
-        },
-        "Methodq": {
-          "name": "q",
-          "type": "(Ljava/lang/Object;Lkn;)V"
-        },
-        "Methoda": {
-          "name": "a",
-          "type": "(Ljava/lang/Long;Lkn;)V"
-        },
-        "Methodhi": {
-          "name": "hi",
-          "type": "(ZLkb;I)V"
-        },
-        "Method\u003cinit\u003e": {
-          "name": "\u003cinit\u003e",
-          "type": "()V"
-        }
-      }
+    "Widget": {
+      "name": "hd",
+      "fields": {},
+      "methods": {}
+    },
+    "Client": {
+      "name": "client",
+      "fields": {},
+      "methods": {}
     }
   }
 }

@@ -1,10 +1,12 @@
 import com.google.gson.GsonBuilder;
+import hook.Hooks;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.reflections.Reflections;
 import reader.NameAndInputStream;
 import reader.ObfuscatedClass;
+import visitor.DependsOn;
 import visitor.HookVisitor;
 import visitor.condition.Condition;
 
@@ -15,7 +17,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 public class HooksFinder {
@@ -42,31 +46,66 @@ public class HooksFinder {
         return Files.newInputStream(unzippedDirectory.resolve(fileName + ".class"));
     }
 
-    private static void loadVisitors(Path jarPath, List<ObfuscatedClass> obfuscatedClasses) {
+    private static void loadVisitors(Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
         var reflections = new Reflections("visitor.impl");
         var classes = reflections.getSubTypesOf(HookVisitor.class);
 
+        var hooks = new Hooks();
+
+        var visitors = new ArrayList<DependentVisitor>();
         classes.forEach(c -> {
             try {
-                var instance = c.getDeclaredConstructor().newInstance();
-                var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
-                if (correctClass == null) {
-                    throw new FileNotFoundException("Unable to find class for " + instance + " with conditions: " + instance.conditions());
+                var instance = c.getDeclaredConstructor(Hooks.class, List.class).newInstance(hooks, obfuscatedClasses);
+                var dependsOn = c.getAnnotation(DependsOn.class);
+                if (dependsOn != null && dependsOn.value().length > 0) {
+                    visitors.add(new DependentVisitor(instance, dependsOn.value()));
+                    return;
                 }
-                instance.setCurrentClass(correctClass);
-
-                var inputStream = getInputStreamForClass(jarPath, correctClass.getName());
-                var classReader = new ClassReader(inputStream);
-                classReader.accept(instance, ClassReader.EXPAND_FRAMES);
-
-                inputStream.close();
-
-                var gson = new GsonBuilder().setPrettyPrinting().create();
-                Files.write(jarPath.getParent().resolve("hooks.json"), gson.toJson(instance.getHooks()).getBytes());
+                findHooks(instance, jarPath, obfuscatedClasses);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
+        var visited = new HashSet<DependentVisitor>();
+        visitors.forEach(v -> {
+            try {
+                visit(v, jarPath, obfuscatedClasses, visitors, visited);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        var gson = new GsonBuilder().setPrettyPrinting().create();
+        Files.write(jarPath.getParent().resolve("hooks.json"), gson.toJson(hooks).getBytes());
+    }
+
+    private static void visit(DependentVisitor dependentVisitor, Path jarPath, List<ObfuscatedClass> obfuscatedClasses, List<DependentVisitor> visitors, Set<DependentVisitor> visited) throws IOException {
+        if (!visited.contains(dependentVisitor)) {
+            for (var dependents : dependentVisitor.getDependents()) {
+                for (var visitor : visitors) {
+                    if (visitor.getHookVisitor().getClass().getName().equals(dependents.getName())) {
+                        visit(visitor, jarPath, obfuscatedClasses, visitors, visited);
+                    }
+                }
+            }
+        }
+        visited.add(dependentVisitor);
+        findHooks(dependentVisitor.getHookVisitor(), jarPath, obfuscatedClasses);
+    }
+
+    private static void findHooks(HookVisitor instance, Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
+        var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
+        if (correctClass == null) {
+            throw new FileNotFoundException("Unable to find class for " + instance + " with conditions: " + instance.conditions());
+        }
+        instance.setCurrentClass(correctClass);
+
+        var inputStream = getInputStreamForClass(jarPath, correctClass.getName());
+        var classReader = new ClassReader(inputStream);
+        classReader.accept(instance, ClassReader.EXPAND_FRAMES);
+
+        inputStream.close();
     }
 
     private static ObfuscatedClass getCorrectClassFromConditions(List<Condition> conditions, List<ObfuscatedClass> obfuscatedClasses) {

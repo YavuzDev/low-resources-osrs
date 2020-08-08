@@ -4,15 +4,24 @@ import reader.ObfuscatedClass;
 
 public class FieldAmountCondition implements Condition {
 
-    private final int amount;
+    private final int min;
+
+    private final int max;
 
     private final String type;
 
-    public FieldAmountCondition(int amount, String type) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount has to be higher than 0");
+    public FieldAmountCondition(int min, int max, String type) {
+        if (min <= 0) {
+            throw new IllegalArgumentException("Min has to be higher than 0");
         }
-        this.amount = amount;
+        if (max <= 0) {
+            throw new IllegalArgumentException("Max has to be higher than 0");
+        }
+        if (max < min) {
+            throw new IllegalArgumentException("Max has to be higher than min");
+        }
+        this.min = min;
+        this.max = max;
         this.type = type;
     }
 
@@ -26,11 +35,15 @@ public class FieldAmountCondition implements Condition {
                 found++;
             }
         }
-        return found == amount;
+        return found >= min && found <= max;
     }
 
-    public int getAmount() {
-        return amount;
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
     }
 
     public String getType() {
@@ -40,7 +53,8 @@ public class FieldAmountCondition implements Condition {
     @Override
     public String toString() {
         return "FieldAmountCondition{" +
-                "amount=" + amount +
+                "min=" + min +
+                ", max=" + max +
                 ", type='" + type + '\'' +
                 '}';
     }
