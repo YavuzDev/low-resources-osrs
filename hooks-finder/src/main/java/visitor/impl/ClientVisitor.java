@@ -29,8 +29,7 @@ public class ClientVisitor extends HookVisitor {
 
     @Override
     public void onSetClassNode() {
-        var method = getMethod(parameterCondition(1, "Widget"), parameterCondition(2, "Int"),
-                parameterCondition(1, "Boolean"));
+        var method = getMethod(parameterCondition(1, "Widget"), parameterCondition(2, "Int"));
         var viewport = getField(method, opcodeCondition(Opcodes.PUTSTATIC), fieldCondition(1, "Widget"));
 
         addStaticFieldHook("viewport", new StaticFieldHook(getOwner(), viewport.name, viewport.desc));
