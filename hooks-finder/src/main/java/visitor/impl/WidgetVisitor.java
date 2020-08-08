@@ -22,4 +22,9 @@ public class WidgetVisitor extends HookVisitor {
     public String className() {
         return "Widget";
     }
+
+    @Override
+    public void onSetClassNode() {
+        
+    }
 }

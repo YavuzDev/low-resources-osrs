@@ -1,11 +1,11 @@
 package visitor.condition;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import reader.ObfuscatedClass;
 
-public class FieldAmountCondition implements Condition {
+public class ParameterAmountCondition implements Condition {
 
     private final int min;
 
@@ -13,7 +13,7 @@ public class FieldAmountCondition implements Condition {
 
     private final String type;
 
-    public FieldAmountCondition(int min, int max, String type) {
+    public ParameterAmountCondition(int min, int max, String type) {
         if (min <= 0) {
             throw new IllegalArgumentException("Min has to be higher than 0");
         }
@@ -30,11 +30,16 @@ public class FieldAmountCondition implements Condition {
 
     @Override
     public boolean check(ObfuscatedClass obfuscatedClass) {
-        var fields = obfuscatedClass.getFields();
+        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for classes");
+    }
+
+    @Override
+    public boolean check(MethodNode methodNode) {
+        var parameters = Type.getArgumentTypes(methodNode.desc);
 
         var found = 0;
-        for (var field : fields) {
-            if (field.desc.equals(type)) {
+        for (var parameter : parameters) {
+            if (parameter.getDescriptor().equals(type)) {
                 found++;
             }
         }
@@ -42,20 +47,8 @@ public class FieldAmountCondition implements Condition {
     }
 
     @Override
-    public boolean check(MethodNode methodNode) {
-        throw new UnsupportedOperationException("FieldAmountCondition doesn't support checking for MethodNode");
-    }
-
-    @Override
     public boolean check(AbstractInsnNode abstractInsnNode) {
-        if (min > 1 || max > 1) {
-            throw new UnsupportedOperationException("Min and max can't be higher than 1 for checking AbstractInsnNode");
-        }
-        if (abstractInsnNode instanceof FieldInsnNode) {
-            var field = (FieldInsnNode) abstractInsnNode;
-            return field.desc.equals(type);
-        }
-        return false;
+        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for AbstractInsnNode");
     }
 
     public int getMin() {
@@ -72,7 +65,7 @@ public class FieldAmountCondition implements Condition {
 
     @Override
     public String toString() {
-        return "FieldAmountCondition{" +
+        return "ParameterCondition{" +
                 "min=" + min +
                 ", max=" + max +
                 ", type='" + type + '\'' +

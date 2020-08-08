@@ -2,8 +2,7 @@ package visitor.impl;
 
 import hook.Hooks;
 import hook.global.StaticFieldHook;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import reader.ObfuscatedClass;
 import visitor.DependsOn;
 import visitor.HookVisitor;
@@ -29,16 +28,11 @@ public class ClientVisitor extends HookVisitor {
     }
 
     @Override
-    public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        if (descriptor.equalsIgnoreCase(correctType("Widget"))) {
-            addStaticFieldHookIfNotContains("viewport", new StaticFieldHook(getCurrentClass().getName(), name, descriptor));
-        }
-        return super.visitField(access, name, descriptor, signature, value);
-    }
+    public void onSetClassNode() {
+        var method = getMethod(parameterCondition(1, "Widget"), parameterCondition(2, "Int"),
+                parameterCondition(1, "Boolean"));
+        var viewport = getField(method, opcodeCondition(Opcodes.PUTSTATIC), fieldCondition(1, "Widget"));
 
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        var methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-        return methodVisitor;
+        addStaticFieldHook("viewport", new StaticFieldHook(getOwner(), viewport.name, viewport.desc));
     }
 }

@@ -8,10 +8,15 @@ import hook.local.FieldHook;
 import hook.local.MethodHook;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import reader.ObfuscatedClass;
 import visitor.condition.Condition;
 import visitor.condition.FieldAmountCondition;
+import visitor.condition.OpcodeCondition;
+import visitor.condition.ParameterAmountCondition;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +37,8 @@ public abstract class HookVisitor extends ClassVisitor {
     public abstract List<Condition> conditions();
 
     public abstract String className();
+
+    public abstract void onSetClassNode();
 
     public Hooks getHooks() {
         return hooks;
@@ -61,17 +68,30 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public FieldAmountCondition fieldCondition(int amount, String type) {
-        return new FieldAmountCondition(amount, amount, correctType(type));
+        return fieldCondition(amount, amount, type);
     }
 
     public FieldAmountCondition fieldCondition(int min, int max, String type) {
         return new FieldAmountCondition(min, max, correctType(type));
     }
 
+    public ParameterAmountCondition parameterCondition(int amount, String type) {
+        return parameterCondition(amount, amount, type);
+    }
+
+    public ParameterAmountCondition parameterCondition(int min, int max, String type) {
+        return new ParameterAmountCondition(min, max, correctType(type));
+    }
+
+    public OpcodeCondition opcodeCondition(int opcode) {
+        return new OpcodeCondition(opcode);
+    }
+
     public String correctType(String original) {
         return switch (original.toLowerCase()) {
             case "string" -> "Ljava/lang/String;";
             case "integer", "int" -> "I";
+            case "boolean", "bool" -> "Z";
             default -> "L" + Objects.requireNonNull(allClasses
                     .stream()
                     .filter(c -> c.getGivenName() != null)
@@ -92,6 +112,52 @@ public abstract class HookVisitor extends ClassVisitor {
         if (!hooks.containsClass(currentClass)) {
             hooks.addClassHook(className(), new ClassHook(currentClass.getName()));
         }
+        onSetClassNode();
+    }
+
+    public MethodNode getMethod(Condition... conditions) {
+        var conditionCount = 0;
+        for (var method : currentClass.getClassNode().methods) {
+            for (var condition : conditions) {
+                if (condition.check(method)) {
+                    conditionCount++;
+                }
+            }
+            if (conditionCount < conditions.length) {
+                conditionCount = 0;
+                continue;
+            }
+            return method;
+        }
+        throw new NullPointerException("No function found with conditions: " + Arrays.toString(conditions));
+    }
+
+    public FieldInsnNode getField(MethodNode methodNode, Condition... conditions) {
+        var conditionCount = 0;
+        for (var instruction : methodNode.instructions) {
+            if (!(instruction instanceof FieldInsnNode)) {
+                continue;
+            }
+            for (var condition : conditions) {
+                if (condition.check(instruction)) {
+                    conditionCount++;
+                }
+            }
+            if (conditionCount < conditions.length) {
+                conditionCount = 0;
+                continue;
+            }
+            return (FieldInsnNode) instruction;
+        }
+        throw new NullPointerException("No static variable found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
+    }
+
+    public List<ObfuscatedClass> getAllClasses() {
+        return allClasses;
+    }
+
+    public String getOwner() {
+        return currentClass.getName();
     }
 
     @Override

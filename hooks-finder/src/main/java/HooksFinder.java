@@ -110,6 +110,7 @@ public class HooksFinder {
         instance.setCurrentClass(correctClass);
 
         var inputStream = getInputStreamForClass(jarPath, correctClass.getName());
+
         var classReader = new ClassReader(inputStream);
         classReader.accept(instance, ClassReader.EXPAND_FRAMES);
 
@@ -130,7 +131,7 @@ public class HooksFinder {
             }
             return obfuscatedClass;
         }
-        return null;
+        throw new NullPointerException("No class found with conditions: " + conditions);
     }
 
     private static List<NameAndInputStream> unZipJar(Path jarPath) throws IOException {
