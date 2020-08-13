@@ -1,8 +1,6 @@
 package com.bot.visitor.impl;
 
-import com.bot.hook.Hooks;
 import com.bot.hook.global.StaticFieldHook;
-import com.bot.reader.ObfuscatedClass;
 import com.bot.visitor.HookVisitor;
 import com.bot.visitor.VisitorInfo;
 import com.bot.visitor.condition.Condition;
@@ -12,10 +10,6 @@ import java.util.List;
 
 @VisitorInfo(name = "Client", dependsOn = {WidgetVisitor.class})
 public class ClientVisitor extends HookVisitor {
-
-    public ClientVisitor(Hooks hooks, List<ObfuscatedClass> allClasses) {
-        super(hooks, allClasses);
-    }
 
     @Override
     public List<Condition> conditions() {

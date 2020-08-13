@@ -31,7 +31,12 @@
     "GameEngine": {
       "name": "bn",
       "fields": {},
-      "methods": {}
+      "methods": {
+        "post": {
+          "name": "h",
+          "type": "(B)V"
+        }
+      }
     },
     "Client": {
       "name": "client",

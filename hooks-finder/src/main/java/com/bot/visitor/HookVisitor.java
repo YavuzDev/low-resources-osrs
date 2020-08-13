@@ -23,16 +23,14 @@ public abstract class HookVisitor extends ClassVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HookVisitor.class);
 
-    private final Hooks hooks;
+    private Hooks hooks;
 
-    private final List<ObfuscatedClass> allClasses;
+    private List<ObfuscatedClass> allClasses;
 
     private ObfuscatedClass currentClass;
 
-    public HookVisitor(Hooks hooks, List<ObfuscatedClass> allClasses) {
+    public HookVisitor() {
         super(Opcodes.ASM9);
-        this.hooks = hooks;
-        this.allClasses = allClasses;
     }
 
     public abstract List<Condition> conditions();
@@ -106,6 +104,7 @@ public abstract class HookVisitor extends ClassVisitor {
             case "integer", "int" -> "I";
             case "boolean", "bool" -> "Z";
             case "long" -> "J";
+            case "byte" -> "B";
             default -> "L" + Objects.requireNonNull(allClasses
                     .stream()
                     .filter(c -> c.getGivenName() != null)
@@ -180,6 +179,14 @@ public abstract class HookVisitor extends ClassVisitor {
 
     public List<ObfuscatedClass> getAllClasses() {
         return allClasses;
+    }
+
+    public void setAllClasses(List<ObfuscatedClass> allClasses) {
+        this.allClasses = allClasses;
+    }
+
+    public void setHooks(Hooks hooks) {
+        this.hooks = hooks;
     }
 
     public String getOwner() {

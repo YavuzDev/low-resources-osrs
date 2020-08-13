@@ -9,8 +9,7 @@ import com.bot.visitor.condition.Condition;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.ClassNode;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,10 @@ public class HooksFinder {
         var visitors = new ArrayList<DependentVisitor>();
         classes.forEach(c -> {
             try {
-                var instance = c.getDeclaredConstructor(Hooks.class, List.class).newInstance(hooks, obfuscatedClasses);
+                var instance = c.getDeclaredConstructor().newInstance();
+                instance.setAllClasses(obfuscatedClasses);
+                instance.setHooks(hooks);
+
                 var info = c.getAnnotation(VisitorInfo.class);
                 if (info == null) {
                     throw new NullPointerException(instance.getClass().getName() + " doesn't have the VisitorInfo annotation");
