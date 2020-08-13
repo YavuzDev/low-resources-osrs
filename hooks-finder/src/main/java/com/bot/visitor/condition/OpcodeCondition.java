@@ -1,8 +1,8 @@
 package com.bot.visitor.condition;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import com.bot.reader.ObfuscatedClass;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class OpcodeCondition implements Condition {
 
@@ -14,7 +14,7 @@ public class OpcodeCondition implements Condition {
 
     @Override
     public boolean check(ObfuscatedClass obfuscatedClass) {
-        throw new UnsupportedOperationException("OpcodeCondition doesn't support checking for classes");
+        throw new UnsupportedOperationException("OpcodeCondition doesn't support checking for ObfuscatedClass");
     }
 
     @Override
@@ -23,8 +23,8 @@ public class OpcodeCondition implements Condition {
     }
 
     @Override
-    public boolean check(AbstractInsnNode abstractInsnNode) {
-        return abstractInsnNode.getOpcode() == opcode;
+    public boolean check(FieldInsnNode fieldInsnNode) {
+        return fieldInsnNode.getOpcode() == opcode;
     }
 
     @Override

@@ -43,6 +43,14 @@ public class ClassHook {
         this.methods.put(givenName, methodHook);
     }
 
+    public FieldHook getField(String fieldName) {
+        return this.fields.get(fieldName);
+    }
+
+    public MethodHook getMethod(String hookName) {
+        return this.methods.get(hookName);
+    }
+
     @Override
     public String toString() {
         return "ClassHook{" +

@@ -1,18 +1,19 @@
 package com.bot;
 
-import com.google.gson.GsonBuilder;
 import com.bot.hook.Hooks;
+import com.bot.reader.NameAndInputStream;
+import com.bot.reader.ObfuscatedClass;
+import com.bot.visitor.HookVisitor;
+import com.bot.visitor.VisitorInfo;
+import com.bot.visitor.condition.Condition;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.bot.reader.NameAndInputStream;
-import com.bot.reader.ObfuscatedClass;
-import com.bot.visitor.DependsOn;
-import com.bot.visitor.HookVisitor;
-import com.bot.visitor.condition.Condition;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class HooksFinder {
             throw new FileNotFoundException(JAR_FILE + " not found set DOWNLOAD_JAR to true");
         }
 
-        var inputStreams = unZipJar(JAR_FILE);
+        var inputStreams = unZipJar();
         var classes = read(inputStreams);
 
         loadVisitors(classes);
@@ -82,14 +83,20 @@ public class HooksFinder {
         classes.forEach(c -> {
             try {
                 var instance = c.getDeclaredConstructor(Hooks.class, List.class).newInstance(hooks, obfuscatedClasses);
-                var dependsOn = c.getAnnotation(DependsOn.class);
-                if (dependsOn != null && dependsOn.value().length > 0) {
-                    visitors.add(new DependentVisitor(instance, dependsOn.value()));
+                var info = c.getAnnotation(VisitorInfo.class);
+                if (info == null) {
+                    throw new NullPointerException(instance.getClass().getName() + " doesn't have the VisitorInfo annotation");
+                }
+                if (info.name().isBlank()) {
+                    throw new NullPointerException(instance.getClass().getName() + " Name in VisitorInfo is blank");
+                }
+                if (info.dependsOn().length > 0) {
+                    visitors.add(new DependentVisitor(instance, info.dependsOn()));
                     return;
                 }
                 findHooks(instance, HooksFinder.JAR_FILE, obfuscatedClasses);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         });
 
@@ -98,7 +105,7 @@ public class HooksFinder {
             try {
                 visit(v, HooksFinder.JAR_FILE, obfuscatedClasses, visitors, visited);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         });
 
@@ -123,11 +130,11 @@ public class HooksFinder {
     private static void findHooks(HookVisitor instance, Path jarPath, List<ObfuscatedClass> obfuscatedClasses) throws IOException {
         LOGGER.info("Visiting {}", instance.getClass().getName());
 
+        var info = instance.getClass().getAnnotation(VisitorInfo.class);
         var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
-        instance.setCurrentClass(correctClass);
+        instance.setCurrentClass(correctClass, info.name());
 
         var inputStream = getInputStreamForClass(jarPath, correctClass.getName());
-
         var classReader = new ClassReader(inputStream);
         classReader.accept(instance, ClassReader.EXPAND_FRAMES);
 
@@ -152,13 +159,13 @@ public class HooksFinder {
         throw new NullPointerException("No class found with conditions: " + conditions);
     }
 
-    private static List<NameAndInputStream> unZipJar(Path jarPath) throws IOException {
-        LOGGER.info("Reading input streams from jar {}", jarPath);
+    private static List<NameAndInputStream> unZipJar() throws IOException {
+        LOGGER.info("Reading input streams from jar {}", HooksFinder.JAR_FILE);
 
         var streams = new ArrayList<NameAndInputStream>();
-        var jarFile = new JarFile(jarPath.toString());
+        var jarFile = new JarFile(HooksFinder.JAR_FILE.toString());
 
-        var unzipDirectory = jarPath.getParent().resolve("unzipped");
+        var unzipDirectory = HooksFinder.JAR_FILE.getParent().resolve("unzipped");
         if (!Files.exists(unzipDirectory)) {
             Files.createDirectory(unzipDirectory);
         }
@@ -172,7 +179,7 @@ public class HooksFinder {
                             FileUtils.copyInputStreamToFile(inputStream, unzipDirectory.resolve(jarEntry.getName()).toFile());
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage(), e);
                     }
                 });
         return streams;
@@ -192,9 +199,39 @@ public class HooksFinder {
 
                 list.add(obfuscatedClass);
 
+//                obfuscatedClass.getClassNode().methods.forEach(m -> m.instructions.forEach(i -> {
+//                    if (i.getOpcode() == Opcodes.IF_ICMPNE) {
+//                        var jumpsInNode = (JumpInsnNode) i;
+//                        if (jumpsInNode.getPrevious() instanceof IntInsnNode) {
+//                            var intIns = (IntInsnNode) jumpsInNode.getPrevious();
+//                            if (intIns.operand == 1504 || intIns.operand == 2504) {
+//                                System.out.println("Found in class jump previous: " + obfuscatedClass.getName() + " function: " + m.name);
+//                            }
+//                        }
+//                        if (jumpsInNode.getPrevious() instanceof VarInsnNode) {
+//                            var variable = (VarInsnNode) jumpsInNode.getPrevious();
+//                            if (variable.getPrevious() instanceof LdcInsnNode) {
+//                                var ldc = (LdcInsnNode) variable.getPrevious();
+//                                if (ldc.cst instanceof Integer) {
+//                                    var value = (int) ldc.cst;
+//                                    if (value == 1504 || value == 2504) {
+//                                        System.out.println("Found in class ldc: " + obfuscatedClass.getName() + " function: " + m.name);
+//                                    }
+//                                }
+//                            }
+//                            if (variable.getPrevious() instanceof IntInsnNode) {
+//                                var intIns = (IntInsnNode) variable.getPrevious();
+//                                if (intIns.operand == 1504 || intIns.operand == 2504) {
+//                                    System.out.println("Found in class var prev: " + obfuscatedClass.getName() + " function: " + m.name);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }));
+
                 nameAndInputStream.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         });
         return list;

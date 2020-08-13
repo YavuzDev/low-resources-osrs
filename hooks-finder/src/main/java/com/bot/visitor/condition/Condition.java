@@ -1,8 +1,8 @@
 package com.bot.visitor.condition;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import com.bot.reader.ObfuscatedClass;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public interface Condition {
 
@@ -10,5 +10,6 @@ public interface Condition {
 
     boolean check(MethodNode methodNode);
 
-    boolean check(AbstractInsnNode abstractInsnNode);
+    boolean check(FieldInsnNode fieldInsnNode);
+
 }

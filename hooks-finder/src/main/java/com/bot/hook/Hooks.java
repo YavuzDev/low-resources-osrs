@@ -1,6 +1,8 @@
 package com.bot.hook;
 
+import com.bot.hook.global.StaticFieldHook;
 import com.bot.hook.global.StaticHooks;
+import com.bot.hook.global.StaticMethodHook;
 import com.bot.hook.local.ClassHook;
 import com.bot.reader.ObfuscatedClass;
 
@@ -22,6 +24,10 @@ public class Hooks {
     public Hooks() {
         this.statics = new StaticHooks();
         this.classes = new HashMap<>();
+    }
+
+    public ClassHook getClassHook(String className) {
+        return classes.get(className);
     }
 
     public Map<String, ClassHook> getClasses() {
@@ -57,6 +63,14 @@ public class Hooks {
                 .getValue();
     }
 
+    public StaticMethodHook getStaticMethod(String value) {
+        return statics.getMethods().get(value);
+    }
+
+    public StaticFieldHook getStaticField(String fieldName) {
+        return statics.getFields().get(fieldName);
+    }
+
     @Override
     public String toString() {
         return "Hooks{" +
@@ -64,4 +78,5 @@ public class Hooks {
                 ", classes=" + classes +
                 '}';
     }
+
 }

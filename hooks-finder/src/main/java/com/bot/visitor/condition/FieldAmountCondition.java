@@ -1,9 +1,8 @@
 package com.bot.visitor.condition;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
+import com.bot.reader.ObfuscatedClass;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import com.bot.reader.ObfuscatedClass;
 
 public class FieldAmountCondition implements Condition {
 
@@ -47,15 +46,11 @@ public class FieldAmountCondition implements Condition {
     }
 
     @Override
-    public boolean check(AbstractInsnNode abstractInsnNode) {
+    public boolean check(FieldInsnNode fieldInsnNode) {
         if (min > 1 || max > 1) {
             throw new UnsupportedOperationException("Min and max can't be higher than 1 for checking AbstractInsnNode");
         }
-        if (abstractInsnNode instanceof FieldInsnNode) {
-            var field = (FieldInsnNode) abstractInsnNode;
-            return field.desc.equals(type);
-        }
-        return false;
+        return fieldInsnNode.desc.equals(type);
     }
 
     public int getMin() {

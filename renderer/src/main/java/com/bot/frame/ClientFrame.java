@@ -1,5 +1,7 @@
 package com.bot.frame;
 
+import com.bot.api.Client;
+
 import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
@@ -19,10 +21,21 @@ public class ClientFrame extends JFrame {
         this.setVisible(true);
     }
 
-    public void renderGame(Applet client) {
+    public void renderGame(Client client) {
         client.setSize(width, height);
         client.init();
         client.start();
-        this.setContentPane(client);
+        this.setContentPane((Applet) client);
+        new Thread(() -> {
+            try {
+                Thread.sleep(15000);
+                System.out.println("Here");
+                client.getViewportWidget().setHidden1(true);
+                client.getViewportWidget().setHidden2(true);
+                client.getViewportWidget().setHidden3(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

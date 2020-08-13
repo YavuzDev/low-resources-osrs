@@ -49,7 +49,7 @@ public class OsrsConfig {
                     try {
                         Files.write(RendererStart.CONFIG_FILE, (line + "\n").getBytes(), StandardOpenOption.APPEND);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage(), e);
                     }
                 }
                 if (line.startsWith("param=")) {

@@ -1,12 +1,12 @@
 package com.bot;
 
+import com.bot.api.Client;
 import com.bot.frame.ClientFrame;
 import com.bot.frame.OsrsAppletStub;
 import com.bot.util.OsrsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.applet.Applet;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -31,6 +31,8 @@ public class RendererStart {
 
     private static final boolean INJECT_HOOKS = false;
 
+    private static final boolean DOWNLOAD_CONFIGS = true;
+
     public static void main(String[] args) throws Exception {
         if (INJECT_HOOKS) {
             LOGGER.info("Injecting hooks");
@@ -41,12 +43,17 @@ public class RendererStart {
             throw new FileNotFoundException(HooksInjector.INJECTED_JAR + " not found set INJECT_HOOKS to true");
         }
 
-        var config = OsrsConfig.load(CONFIG_URL);
+        OsrsConfig config;
+        if (DOWNLOAD_CONFIGS) {
+            config = OsrsConfig.load(CONFIG_URL);
+        } else {
+            config = OsrsConfig.load(CONFIG_FILE.toUri().toURL());//TODO FIX
+        }
 
         LOGGER.info("Loading {} class to render game", MAIN_CLASS_NAME);
         var classLoader = new URLClassLoader(new URL[]{HooksInjector.INJECTED_JAR.toUri().toURL()});
         var clientClass = classLoader.loadClass(MAIN_CLASS_NAME);
-        var client = (Applet) clientClass.newInstance();
+        var client = (Client) clientClass.newInstance();
 
         LOGGER.info("Initializing com.bot.frame with title {}", TITLE);
         var frame = new ClientFrame(800, 600, TITLE);

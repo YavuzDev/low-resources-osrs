@@ -1,9 +1,9 @@
 package com.bot.visitor.condition;
 
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import com.bot.reader.ObfuscatedClass;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 public class ParameterAmountCondition implements Condition {
 
@@ -30,7 +30,7 @@ public class ParameterAmountCondition implements Condition {
 
     @Override
     public boolean check(ObfuscatedClass obfuscatedClass) {
-        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for classes");
+        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for ObfuscatedClass");
     }
 
     @Override
@@ -47,8 +47,8 @@ public class ParameterAmountCondition implements Condition {
     }
 
     @Override
-    public boolean check(AbstractInsnNode abstractInsnNode) {
-        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for AbstractInsnNode");
+    public boolean check(FieldInsnNode fieldInsnNode) {
+        throw new UnsupportedOperationException("ParameterCondition doesn't support checking for FieldInsnNode");
     }
 
     public int getMin() {

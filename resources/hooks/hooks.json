@@ -12,6 +12,24 @@
   "classes": {
     "Widget": {
       "name": "hd",
+      "fields": {
+        "hidden1": {
+          "name": "v",
+          "type": "Z"
+        },
+        "hidden0": {
+          "name": "az",
+          "type": "Z"
+        },
+        "hidden2": {
+          "name": "ap",
+          "type": "Z"
+        }
+      },
+      "methods": {}
+    },
+    "GameEngine": {
+      "name": "bn",
       "fields": {},
       "methods": {}
     },

@@ -1,7 +1,8 @@
 package com.bot;
 
-import com.google.gson.Gson;
 import com.bot.hook.Hooks;
+import com.bot.inject.Injector;
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ public class HooksInjector {
 
     private static final boolean DOWNLOAD_JAR = false;
 
+    private static final String MIXIN_PACKAGE = "com.bot.mixin";
+
     public static void main(String[] args) throws Exception {
         if (FIND_HOOKS) {
             LOGGER.info("Finding hooks");
@@ -44,11 +47,14 @@ public class HooksInjector {
 
         var gson = new Gson();
         var hooks = gson.fromJson(Files.readString(HooksFinder.HOOKS_JSON_PATH), Hooks.class);
-        LOGGER.info("{}", hooks);
+        LOGGER.info("Loading hooks from {}", HooksFinder.HOOKS_JSON_PATH);
 
-        if (!Files.exists(INJECTED_JAR)) {
-            Files.createFile(INJECTED_JAR);
-            FileUtils.copyInputStreamToFile(Files.newInputStream(JAR_FILE), INJECTED_JAR.toFile());
-        }
+        var injector = new Injector(hooks);
+        LOGGER.info("Loading mixins from {}", MIXIN_PACKAGE);
+        injector.loadMixins(MIXIN_PACKAGE);
+
+        LOGGER.info("Starting injecting on file {}", JAR_FILE);
+        injector.inject(JAR_FILE, INJECTED_JAR);
+        LOGGER.info("Injecting finished, result at {}", INJECTED_JAR);
     }
 }

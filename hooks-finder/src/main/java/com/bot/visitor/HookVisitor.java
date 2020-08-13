@@ -6,17 +6,14 @@ import com.bot.hook.global.StaticMethodHook;
 import com.bot.hook.local.ClassHook;
 import com.bot.hook.local.FieldHook;
 import com.bot.hook.local.MethodHook;
+import com.bot.reader.ObfuscatedClass;
+import com.bot.visitor.condition.*;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.bot.reader.ObfuscatedClass;
-import com.bot.visitor.condition.Condition;
-import com.bot.visitor.condition.FieldAmountCondition;
-import com.bot.visitor.condition.OpcodeCondition;
-import com.bot.visitor.condition.ParameterAmountCondition;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,8 +37,6 @@ public abstract class HookVisitor extends ClassVisitor {
 
     public abstract List<Condition> conditions();
 
-    public abstract String className();
-
     public abstract void onSetClassNode();
 
     public Hooks getHooks() {
@@ -49,6 +44,7 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public void addFieldHook(String givenName, FieldHook fieldHook) {
+        LOGGER.info("Adding field hook with name {} and hook: {}", givenName, fieldHook);
         hooks.getCorrectClass(currentClass).addFieldHook(givenName, fieldHook);
     }
 
@@ -57,7 +53,7 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
-        LOGGER.info("Adding static field com.bot.hook with name {} and com.bot.hook: {}", givenName, staticFieldHook);
+        LOGGER.info("Adding static field hook with name {} and hook: {}", givenName, staticFieldHook);
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
@@ -72,12 +68,24 @@ public abstract class HookVisitor extends ClassVisitor {
         hooks.getStatics().addMethod(givenName, staticMethodHook);
     }
 
+    public CallCountCondition callCountCondition(int count, String type) {
+        return new CallCountCondition(count, correctType(type));
+    }
+
+    public FieldAmountCondition fieldCondition(String type) {
+        return fieldCondition(1, type);
+    }
+
     public FieldAmountCondition fieldCondition(int amount, String type) {
         return fieldCondition(amount, amount, type);
     }
 
     public FieldAmountCondition fieldCondition(int min, int max, String type) {
         return new FieldAmountCondition(min, max, correctType(type));
+    }
+
+    public ParameterAmountCondition parameterCondition(String type) {
+        return parameterCondition(1, type);
     }
 
     public ParameterAmountCondition parameterCondition(int amount, String type) {
@@ -97,6 +105,7 @@ public abstract class HookVisitor extends ClassVisitor {
             case "string" -> "Ljava/lang/String;";
             case "integer", "int" -> "I";
             case "boolean", "bool" -> "Z";
+            case "long" -> "J";
             default -> "L" + Objects.requireNonNull(allClasses
                     .stream()
                     .filter(c -> c.getGivenName() != null)
@@ -111,11 +120,11 @@ public abstract class HookVisitor extends ClassVisitor {
         return currentClass;
     }
 
-    public void setCurrentClass(ObfuscatedClass currentClass) {
+    public void setCurrentClass(ObfuscatedClass currentClass, String value) {
         this.currentClass = currentClass;
-        this.currentClass.setGivenName(className());
+        this.currentClass.setGivenName(value);
         if (!hooks.containsClass(currentClass)) {
-            hooks.addClassHook(className(), new ClassHook(currentClass.getName()));
+            hooks.addClassHook(value, new ClassHook(currentClass.getName()));
         }
         onSetClassNode();
     }
@@ -132,10 +141,19 @@ public abstract class HookVisitor extends ClassVisitor {
                 conditionCount = 0;
                 continue;
             }
-            LOGGER.info("Found method {} from conditions {} ", method.name, Arrays.toString(conditions));
+            LOGGER.info("Found method {} from conditions {} in class {} ", method.name, Arrays.toString(conditions), currentClass.getName());
             return method;
         }
         throw new NullPointerException("No function found with conditions: " + Arrays.toString(conditions));
+    }
+
+    public List<CallCountCondition.CallCountField> getFieldsFromCount(CallCountCondition callCountCondition) {
+        for (var method : currentClass.getClassNode().methods) {
+            callCountCondition.getCallCount(method);
+        }
+        var list = callCountCondition.getFields();
+        LOGGER.info("Found fields {} from conditions {} in class {}", list, callCountCondition, currentClass.getName());
+        return list;
     }
 
     public FieldInsnNode getField(MethodNode methodNode, Condition... conditions) {
@@ -144,8 +162,9 @@ public abstract class HookVisitor extends ClassVisitor {
             if (!(instruction instanceof FieldInsnNode)) {
                 continue;
             }
+            var field = (FieldInsnNode) instruction;
             for (var condition : conditions) {
-                if (condition.check(instruction)) {
+                if (condition.check(field)) {
                     conditionCount++;
                 }
             }
@@ -153,11 +172,10 @@ public abstract class HookVisitor extends ClassVisitor {
                 conditionCount = 0;
                 continue;
             }
-            var field = (FieldInsnNode) instruction;
-            LOGGER.info("Found field {} from conditions {} ", field.name, Arrays.toString(conditions));
+            LOGGER.info("Found field {} from conditions {} in class {}", field.name, Arrays.toString(conditions), currentClass.getName());
             return field;
         }
-        throw new NullPointerException("No static variable found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
+        throw new NullPointerException("No field found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
     }
 
     public List<ObfuscatedClass> getAllClasses() {

@@ -1,13 +1,15 @@
-package com.bot.visitor;
+package com.bot.inject.mixin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DependsOn {
+public @interface Inject {
 
-    Class<?>[] value();
+    String value();
+
+    boolean end() default false;
 }
