@@ -31,7 +31,7 @@ public class RendererStart {
 
     private static final boolean INJECT_HOOKS = false;
 
-    private static final boolean DOWNLOAD_CONFIGS = true;
+    public static final boolean DOWNLOAD_CONFIGS = false;
 
     public static void main(String[] args) throws Exception {
         if (INJECT_HOOKS) {
@@ -47,7 +47,7 @@ public class RendererStart {
         if (DOWNLOAD_CONFIGS) {
             config = OsrsConfig.load(CONFIG_URL);
         } else {
-            config = OsrsConfig.load(CONFIG_FILE.toUri().toURL());//TODO FIX
+            config = OsrsConfig.load(CONFIG_FILE.toUri().toURL());
         }
 
         LOGGER.info("Loading {} class to render game", MAIN_CLASS_NAME);

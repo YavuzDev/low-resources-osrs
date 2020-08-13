@@ -48,7 +48,7 @@ public class FieldAmountCondition implements Condition {
     @Override
     public boolean check(FieldInsnNode fieldInsnNode) {
         if (min > 1 || max > 1) {
-            throw new UnsupportedOperationException("Min and max can't be higher than 1 for checking AbstractInsnNode");
+            throw new UnsupportedOperationException("Min and max can't be higher than 1 for checking FieldInsnNode");
         }
         return fieldInsnNode.desc.equals(type);
     }

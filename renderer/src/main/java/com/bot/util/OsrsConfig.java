@@ -35,7 +35,7 @@ public class OsrsConfig {
         var appletProperties = new HashMap<String, String>();
         var classLoaderProperties = new HashMap<String, String>();
 
-        if (RendererStart.SAVE_CONFIG_FILE) {
+        if (RendererStart.SAVE_CONFIG_FILE && RendererStart.DOWNLOAD_CONFIGS) {
             LOGGER.info("Saving config file at {}", RendererStart.CONFIG_FILE);
             if (Files.exists(RendererStart.CONFIG_FILE)) {
                 Files.delete(RendererStart.CONFIG_FILE);
@@ -45,7 +45,7 @@ public class OsrsConfig {
 
         try (var bufferedReader = new BufferedReader(reader)) {
             bufferedReader.lines().forEach(line -> {
-                if (RendererStart.SAVE_CONFIG_FILE) {
+                if (RendererStart.SAVE_CONFIG_FILE && RendererStart.DOWNLOAD_CONFIGS) {
                     try {
                         Files.write(RendererStart.CONFIG_FILE, (line + "\n").getBytes(), StandardOpenOption.APPEND);
                     } catch (IOException e) {
