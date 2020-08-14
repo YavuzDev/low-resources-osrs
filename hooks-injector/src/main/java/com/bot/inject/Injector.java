@@ -161,6 +161,8 @@ public class Injector {
             name = methodHook.getName();
             desc = methodHook.getType();
         }
+        System.out.println(Type.getMethodDescriptor(method));
+        System.out.println(Type.getMethodDescriptor(Type.getReturnType(method), Type.getArgumentTypes(desc)));
         postCopyAdapterGroup.addAdapter(owner, delegate ->
                 new ReplaceMethodAdapter(delegate, name, desc, isStatic, classHook.getName(), method.getName(),
                         Type.getMethodDescriptor(method)));

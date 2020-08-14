@@ -5,11 +5,32 @@
         "owner": "client",
         "name": "nk",
         "type": "Lhd;"
+      },
+      "client": {
+        "owner": "ae",
+        "name": "au",
+        "type": "Lclient;"
       }
     },
-    "methods": {}
+    "methods": {
+      "updateNpcs": {
+        "owner": "q",
+        "name": "hi",
+        "type": "(ZLkb;I)V"
+      }
+    }
   },
   "classes": {
+    "AE": {
+      "name": "ae",
+      "fields": {},
+      "methods": {}
+    },
+    "LongVarSerializer": {
+      "name": "q",
+      "fields": {},
+      "methods": {}
+    },
     "Widget": {
       "name": "hd",
       "fields": {
@@ -40,6 +61,11 @@
     },
     "Client": {
       "name": "client",
+      "fields": {},
+      "methods": {}
+    },
+    "PacketBuffer": {
+      "name": "kb",
       "fields": {},
       "methods": {}
     }

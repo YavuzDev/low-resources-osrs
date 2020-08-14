@@ -70,6 +70,18 @@ public abstract class HookVisitor extends ClassVisitor {
         return new CallCountCondition(count, correctType(type));
     }
 
+    public StaticFieldAmountCondition staticFieldCondition(int access, String type) {
+        return staticFieldCondition(1, access, type);
+    }
+
+    public StaticFieldAmountCondition staticFieldCondition(int amount, int access, String type) {
+        return staticFieldCondition(amount, amount, access, type);
+    }
+
+    public StaticFieldAmountCondition staticFieldCondition(int min, int max, int access, String type) {
+        return new StaticFieldAmountCondition(min, max, access, correctType(type));
+    }
+
     public FieldAmountCondition fieldCondition(String type) {
         return fieldCondition(1, type);
     }
@@ -99,9 +111,14 @@ public abstract class HookVisitor extends ClassVisitor {
     }
 
     public String correctType(String original) {
-        return switch (original.toLowerCase()) {
+        var builder = new StringBuilder();
+        var lowerCase = original.toLowerCase();
+        if (lowerCase.contains("array")) {
+            builder.append("[");
+        }
+        var type = switch (lowerCase) {
             case "string" -> "Ljava/lang/String;";
-            case "integer", "int" -> "I";
+            case "integer", "int", "integerarray" -> "I";
             case "boolean", "bool" -> "Z";
             case "long" -> "J";
             case "byte" -> "B";
@@ -113,6 +130,8 @@ public abstract class HookVisitor extends ClassVisitor {
                     .orElse(null))
                     .getName() + ";";
         };
+        builder.append(type);
+        return builder.toString();
     }
 
     public ObfuscatedClass getCurrentClass() {

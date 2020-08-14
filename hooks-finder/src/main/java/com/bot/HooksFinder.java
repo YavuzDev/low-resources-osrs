@@ -133,6 +133,13 @@ public class HooksFinder {
         LOGGER.info("Visiting {}", instance.getClass().getName());
 
         var info = instance.getClass().getAnnotation(VisitorInfo.class);
+//        for (var obfuscated : obfuscatedClasses) {
+//            System.out.println(obfuscated.getName());
+//            obfuscated.getFields().forEach(f -> {
+//                System.out.println("Name: " + f.name + " type: " + f.desc + " access: " + f.access);
+//            });
+//
+//        }
         var correctClass = getCorrectClassFromConditions(instance.conditions(), obfuscatedClasses);
         instance.setCurrentClass(correctClass, info.name());
 

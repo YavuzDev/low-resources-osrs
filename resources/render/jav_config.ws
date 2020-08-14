@@ -3,7 +3,7 @@ adverturl=http://www.runescape.com/g=oldscape/bare_advert.ws
 codebase=http://oldschool83.runescape.com/
 cachedir=oldschool
 storebase=0
-initial_jar=gamepack_8264506.jar
+initial_jar=gamepack_9344549.jar
 initial_class=client.class
 termsurl=http://www.jagex.com/g=oldscape/terms/terms.ws
 privacyurl=http://www.jagex.com/g=oldscape/privacy/privacy.ws
@@ -44,22 +44,22 @@ msg=err_get_file=Error getting file
 msg=new_version=Update available! You can now launch the client directly from the OldSchool website.\nGet the new version from the link on the OldSchool homepage: http://oldschool.runescape.com/
 msg=new_version_linktext=Open OldSchool Homepage
 msg=new_version_link=http://oldschool.runescape.com/
-param=4=8381
-param=6=0
-param=14=0
-param=19=196515767263-1oo20deqm6edn7ujlihl6rpadk9drhva.apps.googleusercontent.com
-param=15=0
-param=2=https://payments.jagex.com/operator/v1/
-param=16=false
 param=9=ElZAIrq5NpKN6D3mDdihco3oPeYN2KFy2DCquj7JMmECPmLrDP3Bnw
-param=10=5
-param=12=383
-param=1=1
-param=5=134217728
 param=13=.runescape.com
-param=18=
-param=11=https://auth.jagex.com/
-param=7=0
-param=17=http://www.runescape.com/g=oldscape/slr.ws?order=LPWM
 param=3=false
+param=7=0
+param=18=
+param=16=false
+param=4=51621
+param=2=https://payments.jagex.com/operator/v1/
+param=5=134217728
+param=11=https://auth.jagex.com/
+param=19=196515767263-1oo20deqm6edn7ujlihl6rpadk9drhva.apps.googleusercontent.com
+param=10=5
+param=15=0
 param=8=true
+param=14=0
+param=6=0
+param=12=383
+param=17=http://www.runescape.com/g=oldscape/slr.ws?order=LPWM
+param=1=1

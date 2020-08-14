@@ -1,6 +1,7 @@
 package com.bot.frame;
 
 import com.bot.api.Client;
+import com.google.common.base.Functions;
 
 import javax.swing.*;
 import java.applet.Applet;
@@ -26,16 +27,5 @@ public class ClientFrame extends JFrame {
         client.init();
         client.start();
         this.setContentPane((Applet) client);
-        new Thread(() -> {
-            try {
-                Thread.sleep(15000);
-                System.out.println("Here");
-                client.getViewportWidget().setHidden1(true);
-                client.getViewportWidget().setHidden2(true);
-                client.getViewportWidget().setHidden3(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
     }
 }
