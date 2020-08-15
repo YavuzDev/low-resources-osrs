@@ -21,7 +21,7 @@ public class RendererStart {
 
     private static final String MAIN_CLASS_NAME = "client";
 
-    private static final String TITLE = "Low Resources Bot Client";
+    private static final String TITLE = "Low Resources Osrs Client";
 
     public static final Path RENDER_DIRECTORY = HooksFinder.RESOURCES_DIRECTORY.resolve("render");
 
