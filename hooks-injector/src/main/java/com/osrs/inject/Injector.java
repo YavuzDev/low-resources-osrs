@@ -1,5 +1,6 @@
 package com.osrs.inject;
 
+import com.google.common.io.ByteStreams;
 import com.osrs.hook.Hooks;
 import com.osrs.hook.global.StaticFieldHook;
 import com.osrs.hook.global.StaticMethodHook;
@@ -8,8 +9,6 @@ import com.osrs.hook.local.FieldHook;
 import com.osrs.hook.local.MethodHook;
 import com.osrs.inject.adapter.*;
 import com.osrs.inject.mixin.*;
-import com.google.common.io.ByteStreams;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 import org.reflections.Reflections;
 
@@ -177,13 +176,13 @@ public class Injector {
     }
 
     private void addCopyMethodAdapter(Mixin mixin, ClassHook classHook, Method method) {
-        Copy copy = method.getAnnotation(Copy.class);
-        boolean isStatic = method.isAnnotationPresent(Static.class) || Modifier.isStatic(method.getModifiers());
+        var copy = method.getAnnotation(Copy.class);
+        var isStatic = method.isAnnotationPresent(Static.class) || Modifier.isStatic(method.getModifiers());
         String owner;
         String name;
         String desc;
         if (isStatic) {
-            StaticMethodHook methodHook = hooks.getStaticMethod(copy.value());
+            var methodHook = hooks.getStaticMethod(copy.value());
             if (methodHook == null) {
                 throw new IllegalStateException("No static method hook found for " + copy.value());
             }
@@ -191,7 +190,7 @@ public class Injector {
             name = methodHook.getName();
             desc = methodHook.getType();
         } else {
-            MethodHook methodHook = classHook.getMethod(copy.value());
+            var methodHook = classHook.getMethod(copy.value());
             if (methodHook == null) {
                 throw new IllegalStateException("No method hook found for " + mixin.value() + "." + copy.value());
             }
@@ -200,7 +199,7 @@ public class Injector {
             desc = methodHook.getType();
         }
 
-        ClassVisitor delegate = copyAdapterGroup.delegate(classHook.getName());
+        var delegate = copyAdapterGroup.delegate(classHook.getName());
         copyAdapterGroup.addAdapter(owner, new CopyMethodAdapter(copyAdapterGroup.delegate(owner),
                 name, desc, delegate, method.getName()));
     }
@@ -316,7 +315,7 @@ public class Injector {
             preCopyAdapterGroup.addAdapter(classHook.getName(), delegate ->
                     new AddInvokeAdapter(delegate, method.getName(), Type.getMethodDescriptor(method),
                             classHook.getName(), methodHook.getName(), methodHook.getType(),
-                            null));//TODO CHECK THIS
+                            methodHook.getDummyValue()));
         }
     }
 

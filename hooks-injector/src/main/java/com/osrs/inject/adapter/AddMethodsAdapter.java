@@ -135,7 +135,7 @@ public class AddMethodsAdapter extends ClassVisitor {
                                 throw new IllegalStateException("No static method hook found for " + hookName);
                             }
                             descriptor = methodHook.getType();
-                            dummyValue = null;//TODO check this
+                            dummyValue = methodHook.getDummyValue();
                         } else {
                             MethodHook methodHook = classHook.getMethod(hookName);
                             if (methodHook == null) {
@@ -143,7 +143,7 @@ public class AddMethodsAdapter extends ClassVisitor {
                                         + hookName);
                             }
                             descriptor = methodHook.getType();
-                            dummyValue = null;//TODO check this
+                            dummyValue = methodHook.getDummyValue();
                         }
                         Type[] newArgTypes = Type.getArgumentTypes(descriptor);
                         if (!Arrays.equals(argTypes, newArgTypes)) {

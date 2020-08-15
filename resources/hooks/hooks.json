@@ -16,7 +16,8 @@
       "updateNpcs": {
         "owner": "q",
         "name": "hi",
-        "type": "(ZLkb;I)V"
+        "type": "(ZLkb;I)V",
+        "dummyValue": 1542604247
       }
     }
   },
@@ -55,7 +56,8 @@
       "methods": {
         "post": {
           "name": "h",
-          "type": "(B)V"
+          "type": "(B)V",
+          "dummyValue": 0
         }
       }
     },

@@ -17,18 +17,19 @@ public abstract class ClientMixin implements Client {
     public abstract Widget getViewportWidget();
 
     @Copy("updateNpcs")
-    private static void rs$UpdateNpcs(boolean var0, PacketBuffer var1, int var2) {
+    private static void rs$UpdateNpcs(boolean var0, PacketBuffer var1) {
         throw new UnsupportedOperationException();
     }
 
     @Replace("updateNpcs")
-    public static void updateNpcs(boolean var0, PacketBuffer var1, int var2) {
-        if (client.getViewportWidget() != null) {
-            client.getViewportWidget().setHidden1(true);
-            client.getViewportWidget().setHidden2(true);
-            client.getViewportWidget().setHidden3(true);
-        }
-        rs$UpdateNpcs(var0, var1, var2);
+    public static void updateNpcs(boolean var0, PacketBuffer var1) {
+//        var viewport = client.getViewportWidget();
+//        if (viewport != null) {
+//            viewport.setHidden1(true);
+//            viewport.setHidden2(true);
+//            viewport.setHidden3(true);
+//        }
+        rs$UpdateNpcs(var0, var1);
     }
 
 }

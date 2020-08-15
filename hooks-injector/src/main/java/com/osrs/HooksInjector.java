@@ -1,16 +1,18 @@
 package com.osrs;
 
+import com.google.gson.Gson;
 import com.osrs.hook.Hooks;
 import com.osrs.inject.Injector;
-import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.jar.JarFile;
 
 public class HooksInjector {
 
@@ -29,6 +31,8 @@ public class HooksInjector {
     private static final boolean DOWNLOAD_JAR = false;
 
     private static final String MIXIN_PACKAGE = "com.osrs.mixin";
+
+    private static final boolean UNZIP_INJECTED_JAR = false;
 
     public static void main(String[] args) throws Exception {
         if (FIND_HOOKS) {
@@ -56,5 +60,31 @@ public class HooksInjector {
         LOGGER.info("Starting injecting on file {}", JAR_FILE);
         injector.inject(JAR_FILE, INJECTED_JAR);
         LOGGER.info("Injecting finished, result at {}", INJECTED_JAR);
+
+        if (UNZIP_INJECTED_JAR) {
+            LOGGER.info("Unzipping injected jar ");
+            unZipJar();
+        }
+    }
+
+    private static void unZipJar() throws IOException {
+        var jarFile = new JarFile(INJECTED_JAR.toString());
+
+        var unzipDirectory = INJECTED_JAR.getParent().resolve("unzipped");
+        if (!Files.exists(unzipDirectory)) {
+            Files.createDirectory(unzipDirectory);
+        }
+
+        jarFile.versionedStream()
+                .filter(jarEntry -> jarEntry.getName().endsWith(".class"))
+                .forEach(jarEntry -> {
+                    try {
+                        var inputStream = jarFile.getInputStream(jarEntry);
+                        FileUtils.copyInputStreamToFile(inputStream, unzipDirectory.resolve(jarEntry.getName()).toFile());
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                });
+        LOGGER.info("Unzipping finished, files at {}", unzipDirectory);
     }
 }

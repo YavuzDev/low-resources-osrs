@@ -18,6 +18,6 @@ public class LongVarSerializerVisitor extends HookVisitor {
     @Override
     public void onSetClassNode() {
         var updateNpcs = getMethod(parameterCondition("Boolean"), parameterCondition("PacketBuffer"));
-        addStaticMethodHook("updateNpcs", new StaticMethodHook(getOwner(), updateNpcs.name, updateNpcs.desc));
+        addStaticMethodHook("updateNpcs", new StaticMethodHook(getOwner(), updateNpcs.name, updateNpcs.desc, updateNpcs.parameters.size() > 2 ? 1542604247 : null));
     }
 }
