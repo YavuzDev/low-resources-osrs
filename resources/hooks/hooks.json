@@ -56,8 +56,7 @@
       "methods": {
         "post": {
           "name": "h",
-          "type": "(B)V",
-          "dummyValue": 0
+          "type": "(B)V"
         }
       }
     },

@@ -10,7 +10,9 @@ import com.osrs.reader.ObfuscatedClass;
 import com.osrs.visitor.condition.*;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +48,18 @@ public abstract class HookVisitor extends ClassVisitor {
         hooks.getCorrectClass(currentClass).addFieldHook(givenName, fieldHook);
     }
 
+    public void addFieldHook(String givenName, FieldInsnNode fieldInsnNode) {
+        addFieldHook(givenName, new FieldHook(fieldInsnNode.name, fieldInsnNode.desc));
+    }
+
     public void addMethodHook(String givenName, MethodHook methodHook) {
+        LOGGER.info("Adding method hook with name {} and hook: {}", givenName, methodHook);
         hooks.getCorrectClass(currentClass).addMethodHook(givenName, methodHook);
+    }
+
+    public void addMethodHook(String givenName, MethodNode methodNode, int correctParameterSize) {
+        var methodHook = new MethodHook(methodNode.name, methodNode.desc, Type.getArgumentTypes(methodNode.desc).length != correctParameterSize ? 1542604247 : null);
+        addMethodHook(givenName, methodHook);
     }
 
     public void addStaticFieldHook(String givenName, StaticFieldHook staticFieldHook) {
@@ -55,15 +67,29 @@ public abstract class HookVisitor extends ClassVisitor {
         hooks.getStatics().addField(givenName, staticFieldHook);
     }
 
+    public void addStaticFieldHook(String givenName, FieldInsnNode fieldInsnNode) {
+        addStaticFieldHook(givenName, new StaticFieldHook(getOwner(), fieldInsnNode.name, fieldInsnNode.desc));
+    }
+
+    public void addStaticFieldHook(String givenName, FieldNode fieldNode) {
+        addStaticFieldHook(givenName, new StaticFieldHook(getOwner(), fieldNode.name, fieldNode.desc));
+    }
+
     public void addStaticFieldHookIfNotContains(String givenName, StaticFieldHook staticFieldHook) {
         if (hooks.containsStaticField(givenName)) {
             return;
         }
-        hooks.getStatics().addField(givenName, staticFieldHook);
+        addStaticFieldHook(givenName, staticFieldHook);
     }
 
     public void addStaticMethodHook(String givenName, StaticMethodHook staticMethodHook) {
+        LOGGER.info("Adding static method hook with name {} and hook: {}", givenName, staticMethodHook);
         hooks.getStatics().addMethod(givenName, staticMethodHook);
+    }
+
+    public void addStaticMethodHook(String givenName, MethodNode methodNode, int correctParameterSize) {
+        var staticMethodHook = new StaticMethodHook(getOwner(), methodNode.name, methodNode.desc, Type.getArgumentTypes(methodNode.desc).length != correctParameterSize ? 1542604247 : null);
+        addStaticMethodHook(givenName, staticMethodHook);
     }
 
     public CallCountCondition callCountCondition(int count, String type) {
@@ -194,6 +220,13 @@ public abstract class HookVisitor extends ClassVisitor {
             return field;
         }
         throw new NullPointerException("No field found with conditions: " + Arrays.toString(conditions) + " for method: " + methodNode);
+    }
+
+    public FieldNode getFieldFromType(List<FieldNode> fields, String type) {
+        return fields.stream()
+                .filter(f -> f.desc.equals(correctType(type)))
+                .findFirst()
+                .orElse(null);
     }
 
     public List<ObfuscatedClass> getAllClasses() {

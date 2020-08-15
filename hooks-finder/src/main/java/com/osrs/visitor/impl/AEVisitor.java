@@ -1,6 +1,5 @@
 package com.osrs.visitor.impl;
 
-import com.osrs.hook.global.StaticFieldHook;
 import com.osrs.visitor.HookVisitor;
 import com.osrs.visitor.VisitorInfo;
 import com.osrs.visitor.condition.Condition;
@@ -18,10 +17,8 @@ public class AEVisitor extends HookVisitor {
     @Override
     public void onSetClassNode() {
         var fields = getCurrentClass().getFields();
-        fields.stream()
-                .filter(f -> f.desc.equals(correctType("Client")))
-                .findFirst()
-                .ifPresent(client -> addStaticFieldHook("client", new StaticFieldHook(getOwner(), client.name, client.desc)));
+        var client = getFieldFromType(fields, "Client");
 
+        addStaticFieldHook("client", client);
     }
 }

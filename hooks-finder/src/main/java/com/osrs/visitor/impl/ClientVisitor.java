@@ -1,6 +1,5 @@
 package com.osrs.visitor.impl;
 
-import com.osrs.hook.global.StaticFieldHook;
 import com.osrs.visitor.HookVisitor;
 import com.osrs.visitor.VisitorInfo;
 import com.osrs.visitor.condition.Condition;
@@ -21,6 +20,6 @@ public class ClientVisitor extends HookVisitor {
         var method = getMethod(parameterCondition("Widget"), parameterCondition(2, "Int"));
         var viewport = getField(method, opcodeCondition(Opcodes.PUTSTATIC), fieldCondition("Widget"));
 
-        addStaticFieldHook("viewport", new StaticFieldHook(getOwner(), viewport.name, viewport.desc));
+        addStaticFieldHook("viewport", viewport);
     }
 }
