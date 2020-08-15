@@ -23,12 +23,12 @@ public abstract class ClientMixin implements Client {
 
     @Replace("updateNpcs")
     public static void updateNpcs(boolean var0, PacketBuffer var1) {
-//        var viewport = client.getViewportWidget();
-//        if (viewport != null) {
-//            viewport.setHidden1(true);
-//            viewport.setHidden2(true);
-//            viewport.setHidden3(true);
-//        }
+        var viewport = client.getViewportWidget();
+        if (viewport != null) {
+            viewport.setHidden1(true);
+            viewport.setHidden2(true);
+            viewport.setHidden3(true);
+        }
         rs$UpdateNpcs(var0, var1);
     }
 
