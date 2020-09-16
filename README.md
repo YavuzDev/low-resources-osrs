@@ -218,6 +218,8 @@ The renderer does nothing special, it just puts the injected jar from the Hooks 
 
 ## Preview
 
+In the preview, the rendering gets disabled. Nothing new gets rendered when the camera moves.
+
 ![Alt Text](https://i.imgur.com/4ayQzfr.gif)
 
 
